@@ -1,33 +1,234 @@
-#include <WiFi.h>
-#include <WebServer.h>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Farming Greenhouse</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <style>
+        body {font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;}
+        .container {max-width: 800px; margin: auto; padding: 20px;}
+        .card {margin-bottom: 20px;}
+        button {margin-top: 10px;}
+        .btn-success {background-color: #28a745; border-color: #28a745;}
+        .btn-success:hover {background-color: #218838; border-color: #1e7e34;}
+        .fas {margin-right: 10px;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title text-center">Smart Farming Greenhouse</h3>
+                <h4 class="card-subtitle mb-2 text-muted text-center">Current Time: <span id="current_time">Loading...</span></h4>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Relay Status</h5>
+                <div class="row">
+                    <div class="col-md-6 text-center">
+                        <h6>Relay 1</h6>
+                        <p id="relay1_status">OFF</p>
+                        <button class="btn btn-primary" onclick="toggleRelay('relay1', 'on')"><i class="fas fa-power-off"></i>Turn Relay 1 ON</button>
+                        <button class="btn btn-danger" onclick="toggleRelay('relay1', 'off')"><i class="fas fa-power-off"></i>Turn Relay 1 OFF</button>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <h6>Relay 2</h6>
+                        <p id="relay2_status">OFF</p>
+                        <button class="btn btn-primary" onclick="toggleRelay('relay2', 'on')"><i class="fas fa-power-off"></i>Turn Relay 2 ON</button>
+                        <button class="btn btn-danger" onclick="toggleRelay('relay2', 'off')"><i class="fas fa-power-off"></i>Turn Relay 2 OFF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Set Timer</h5>
+                <form id="timerForm">
+                    <div class="form-group">
+                        <label>Relay 1 ON Time:</label>
+                        <div class="form-row">
+                            <div class="col">
+                                <select name="relay1_on_hour" class="form-control">
+                                    ${generateHourOptions()}
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select name="relay1_on_minute" class="form-control">
+                                    ${generateMinuteOptions()}
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select name="relay1_on_second" class="form-control">
+                                    ${generateSecondOptions()}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Relay 1 OFF Time:</label>
+                        <div class="form-row">
+                            <div class="col">
+                                <select name="relay1_off_hour" class="form-control">
+                                    ${generateHourOptions()}
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select name="relay1_off_minute" class="form-control">
+                                    ${generateMinuteOptions()}
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select name="relay1_off_second" class="form-control">
+                                    ${generateSecondOptions()}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Relay 2 ON Time:</label>
+                        <div class="form-row">
+                            <div class="col">
+                                <select name="relay2_on_hour" class="form-control">
+                                    ${generateHourOptions()}
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select name="relay2_on_minute" class="form-control">
+                                    ${generateMinuteOptions()}
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select name="relay2_on_second" class="form-control">
+                                    ${generateSecondOptions()}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Relay 2 OFF Time:</label>
+                        <div class="form-row">
+                            <div class="col">
+                                <select name="relay2_off_hour" class="form-control">
+                                    ${generateHourOptions()}
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select name="relay2_off_minute" class="form-control">
+                                    ${generateMinuteOptions()}
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select name="relay2_off_second" class="form-control">
+                                    ${generateSecondOptions()}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" id="setTimerButton" class="btn btn-success" onclick="setTimer()"><i class="fas fa-clock"></i>Set Timer</button>
+                </form>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Mode</h5>
+                <form id="modeForm">
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" id="manual" name="mode" value="manual">
+                        <label class="form-check-label" for="manual">Manual</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" id="auto" name="mode" value="auto" checked>
+                        <label class="form-check-label" for="auto">Auto</label>
+                    </div>
+                    <button type="button" id="setModeButton" class="btn btn-success" onclick="setMode()"><i class="fas fa-cogs"></i>Set Mode</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        const ESP32_IP = 'http://<ESP32_IP_ADDRESS>'; // แทนที่ <ESP32_IP_ADDRESS> ด้วย IP Address ของ ESP32 ที่จดไว้
 
-const char* ssid = "Wiparat_2.4GHz";
-const char* password = "ondy2532";
+        function toggleRelay(relay, action) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById(relay + '_status').innerHTML = action == 'on' ? 'ON' : 'OFF';
+                    toastr.success('Relay ' + relay.charAt(relay.length - 1) + ' turned ' + (action == 'on' ? 'ON' : 'OFF'));
+                }
+            };
+            xhttp.open('GET', `${ESP32_IP}/${relay}/${action}`, true);
+            xhttp.send();
+        }
 
-WebServer server(80);
+        function setTimer() {
+            var form = document.getElementById('timerForm');
+            var formData = new FormData(form);
+            var xhttp = new XMLHttpRequest();
+            xhttp.open('GET', `${ESP32_IP}/set_timer?` + new URLSearchParams(formData).toString(), true);
+            xhttp.send();
+            document.getElementById('setTimerButton').classList.add('button-pressed'); // เปลี่ยนสีเมื่อกดปุ่ม
+            setTimeout(function() {
+                document.getElementById('setTimerButton').classList.remove('button-pressed');
+            }, 2000);
+            toastr.success('Timer set successfully');
+        }
 
-void setup() {
-  Serial.begin(115200);
+        function setMode() {
+            var form = document.getElementById('modeForm');
+            var formData = new FormData(form);
+            var xhttp = new XMLHttpRequest();
+            xhttp.open('GET', `${ESP32_IP}/set_mode?` + new URLSearchParams(formData).toString(), true);
+            xhttp.send();
+            document.getElementById('setModeButton').classList.add('button-pressed'); // เปลี่ยนสีเมื่อกดปุ่ม
+            setTimeout(function() {
+                document.getElementById('setModeButton').classList.remove('button-pressed');
+            }, 2000);
+            toastr.success('Mode set to ' + (formData.get('mode') == 'auto' ? 'Auto' : 'Manual'));
+        }
 
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Connecting to WiFi...");
-  }
-  Serial.println("Connected to WiFi");
+        function updateTime() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById('current_time').innerHTML = this.responseText;
+                }
+            };
+            xhttp.open('GET', `${ESP32_IP}/get_time`, true);
+            xhttp.send();
+        }
 
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.localIP());
+        setInterval(updateTime, 1000);
 
-  server.on("/", handleRoot);
-  server.begin();
-  Serial.println("HTTP server started");
-}
+        function generateHourOptions() {
+            let options = "";
+            for (let i = 0; i < 24; i++) {
+                options += `<option value="${i}">${i}</option>`;
+            }
+            return options;
+        }
 
-void handleRoot() {
-  server.send(200, "text/plain", "Hello from ESP32!");
-}
+        function generateMinuteOptions() {
+            let options = "";
+            for (let i = 0; i < 60; i++) {
+                options += `<option value="${i}">${i}</option>`;
+            }
+            return options;
+        }
 
-void loop() {
-  server.handleClient();
-}
+        function generateSecondOptions() {
+            let options = "";
+            for (let i = 0; i < 60; i++) {
+                options += `<option value="${i}">${i}</option>`;
+            }
+            return options;
+        }
+    </script>
+</body>
+</html>
