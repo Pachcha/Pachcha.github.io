@@ -54,16 +54,19 @@
                             <div class="col">
                                 <select name="relay1_on_hour" class="form-control">
                                     <!-- hour options -->
+                                    ${generateHourOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay1_on_minute" class="form-control">
                                     <!-- minute options -->
+                                    ${generateMinuteOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay1_on_second" class="form-control">
                                     <!-- second options -->
+                                    ${generateSecondOptions()}
                                 </select>
                             </div>
                         </div>
@@ -74,16 +77,19 @@
                             <div class="col">
                                 <select name="relay1_off_hour" class="form-control">
                                     <!-- hour options -->
+                                    ${generateHourOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay1_off_minute" class="form-control">
                                     <!-- minute options -->
+                                    ${generateMinuteOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay1_off_second" class="form-control">
                                     <!-- second options -->
+                                    ${generateSecondOptions()}
                                 </select>
                             </div>
                         </div>
@@ -94,16 +100,19 @@
                             <div class="col">
                                 <select name="relay2_on_hour" class="form-control">
                                     <!-- hour options -->
+                                    ${generateHourOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay2_on_minute" class="form-control">
                                     <!-- minute options -->
+                                    ${generateMinuteOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay2_on_second" class="form-control">
                                     <!-- second options -->
+                                    ${generateSecondOptions()}
                                 </select>
                             </div>
                         </div>
@@ -114,16 +123,19 @@
                             <div class="col">
                                 <select name="relay2_off_hour" class="form-control">
                                     <!-- hour options -->
+                                    ${generateHourOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay2_off_minute" class="form-control">
                                     <!-- minute options -->
+                                    ${generateMinuteOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay2_off_second" class="form-control">
                                     <!-- second options -->
+                                    ${generateSecondOptions()}
                                 </select>
                             </div>
                         </div>
@@ -153,6 +165,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
+        const ESP32_IP = 'http://192.168.1.100'; // แทนที่ <ESP32_IP_ADDRESS> ด้วย IP Address ของ ESP32
+
         function toggleRelay(relay, action) {
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function() {
@@ -161,7 +175,7 @@
                     toastr.success('Relay ' + relay.charAt(relay.length - 1) + ' turned ' + (action == 'on' ? 'ON' : 'OFF'));
                 }
             };
-            xhttp.open('GET', '/' + relay + '/' + action, true);
+            xhttp.open('GET', `${ESP32_IP}/${relay}/${action}`, true);
             xhttp.send();
         }
 
@@ -169,7 +183,7 @@
             var form = document.getElementById('timerForm');
             var formData = new FormData(form);
             var xhttp = new XMLHttpRequest();
-            xhttp.open('GET', '/set_timer?' + new URLSearchParams(formData).toString(), true);
+            xhttp.open('GET', `${ESP32_IP}/set_timer?` + new URLSearchParams(formData).toString(), true);
             xhttp.send();
             document.getElementById('setTimerButton').classList.add('button-pressed'); // เปลี่ยนสีเมื่อกดปุ่ม
             setTimeout(function() {
@@ -182,7 +196,7 @@
             var form = document.getElementById('modeForm');
             var formData = new FormData(form);
             var xhttp = new XMLHttpRequest();
-            xhttp.open('GET', '/set_mode?' + new URLSearchParams(formData).toString(), true);
+            xhttp.open('GET', `${ESP32_IP}/set_mode?` + new URLSearchParams(formData).toString(), true);
             xhttp.send();
             document.getElementById('setModeButton').classList.add('button-pressed'); // เปลี่ยนสีเมื่อกดปุ่ม
             setTimeout(function() {
@@ -198,7 +212,7 @@
                     document.getElementById('current_time').innerHTML = this.responseText;
                 }
             };
-            xhttp.open('GET', '/get_time', true);
+            xhttp.open('GET', `${ESP32_IP}/get_time`, true);
             xhttp.send();
         }
 
