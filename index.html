@@ -53,19 +53,16 @@
                         <div class="form-row">
                             <div class="col">
                                 <select name="relay1_on_hour" class="form-control">
-                                    <!-- hour options -->
                                     ${generateHourOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay1_on_minute" class="form-control">
-                                    <!-- minute options -->
                                     ${generateMinuteOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay1_on_second" class="form-control">
-                                    <!-- second options -->
                                     ${generateSecondOptions()}
                                 </select>
                             </div>
@@ -76,19 +73,16 @@
                         <div class="form-row">
                             <div class="col">
                                 <select name="relay1_off_hour" class="form-control">
-                                    <!-- hour options -->
                                     ${generateHourOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay1_off_minute" class="form-control">
-                                    <!-- minute options -->
                                     ${generateMinuteOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay1_off_second" class="form-control">
-                                    <!-- second options -->
                                     ${generateSecondOptions()}
                                 </select>
                             </div>
@@ -99,19 +93,16 @@
                         <div class="form-row">
                             <div class="col">
                                 <select name="relay2_on_hour" class="form-control">
-                                    <!-- hour options -->
                                     ${generateHourOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay2_on_minute" class="form-control">
-                                    <!-- minute options -->
                                     ${generateMinuteOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay2_on_second" class="form-control">
-                                    <!-- second options -->
                                     ${generateSecondOptions()}
                                 </select>
                             </div>
@@ -122,19 +113,16 @@
                         <div class="form-row">
                             <div class="col">
                                 <select name="relay2_off_hour" class="form-control">
-                                    <!-- hour options -->
                                     ${generateHourOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay2_off_minute" class="form-control">
-                                    <!-- minute options -->
                                     ${generateMinuteOptions()}
                                 </select>
                             </div>
                             <div class="col">
                                 <select name="relay2_off_second" class="form-control">
-                                    <!-- second options -->
                                     ${generateSecondOptions()}
                                 </select>
                             </div>
@@ -217,6 +205,30 @@
         }
 
         setInterval(updateTime, 1000);
+
+        function generateHourOptions() {
+            let options = "";
+            for (let i = 0; i < 24; i++) {
+                options += `<option value="${i}">${i}</option>`;
+            }
+            return options;
+        }
+
+        function generateMinuteOptions() {
+            let options = "";
+            for (let i = 0; i < 60; i++) {
+                options += `<option value="${i}">${i}</option>`;
+            }
+            return options;
+        }
+
+        function generateSecondOptions() {
+            let options = "";
+            for (let i = 0; i < 60; i++) {
+                options += `<option value="${i}">${i}</option>`;
+            }
+            return options;
+        }
     </script>
 </body>
 </html>
